@@ -1,1 +1,2 @@
-# oop-2uzduotis
+# Objektinis Programavimas 2 uzd.
+
