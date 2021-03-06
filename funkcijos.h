@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <numeric>
 #include <iomanip>
+#include <iostream>
+#include <fstream>
 
 using std::string;
 using std::vector;
@@ -13,6 +15,7 @@ using std::stoi;
 using std::accumulate;
 using std::setw;
 using std::left;
+using std::ifstream;
 
 struct Studentas {
   string vardas, pavarde;
@@ -20,8 +23,16 @@ struct Studentas {
   vector<int> pazymiai;
 };
 
+bool startsWith(string s, string query) {
+  return s.rfind(query, 0) == 0;
+}
+
 int gautiAtsitiktini() {
   return rand() % 10 + 1;
+}
+
+float apvalinti(float input) {
+  return ((int)(input * 100.0 + 0.5)) / 100.0;
 }
 
 int parse(string s) {
@@ -30,6 +41,15 @@ int parse(string s) {
   } catch (std::invalid_argument const &e) {
     return -2;
   }
+}
+
+float skaiciuotiMediana(Studentas stud) {
+  int dydis = stud.pazymiai.size();
+  return dydis % 2 == 0 ? (stud.pazymiai[dydis / 2.0 - 1.0] + stud.pazymiai[dydis / 2.0]) / 2.0 : stud.pazymiai[dydis/ 2.0];
+}
+
+float skaiciuotiVidurki(Studentas stud) {
+  return apvalinti((accumulate(stud.pazymiai.begin(),  stud.pazymiai.end(), 0.0) / stud.pazymiai.size()) * 0.4);
 }
 
 int arPazymys(string s) {
@@ -61,8 +81,4 @@ bool gautiAtsakyma(string ats) {
 
   cout << "Neteisingas atsakymas, priimame kaip atsakyma 'Ne'." << endl;
   return false;
-}
-
-float apvalinti(float input) {
-  return ((int)(input * 100 + 0.5)) / 100;
 }
