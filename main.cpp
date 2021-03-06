@@ -103,8 +103,12 @@ void nuskaityti(vector<Studentas> *studentai, bool *vidurkis, bool *isFailo) {
 void nuskaitytiIsFailo(vector<Studentas> *studentai, bool* isFailo) {
   int pazymiuSkaicius = 0, dabarSk = 1, paz;
   ifstream kursiokai;
-  kursiokai.open("kursiokai.txt");
-
+  try {
+    kursiokai.open("kursiokai.txt");
+  } catch(std::exception &e) {
+    cout << "Nerastas kursiokai.txt failas" << endl;
+  }
+  
   string duom;
   Studentas stud;
 
