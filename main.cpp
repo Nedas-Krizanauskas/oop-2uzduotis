@@ -1,213 +1,353 @@
 #include <iostream>
 #include "funkcijos.h" // programos funkcijos, studentu info
 
-void nuskaityti(vector<Studentas> *studentai, bool *vidurkis, bool *isFailo);
-void nuskaitytiIsFailo(vector<Studentas> *studentai, bool*isFailo);
-void spausdintiRezultatus(vector<Studentas> studentai, bool *vidurkis, bool* isFailo);
+void nuskaityti(vector<Studentas>* studentai, bool* vidurkis, bool* isFailo, string fileName);
+void nuskaitytiIsFailo(vector<Studentas>* studentai, bool* isFailo, string fileName);
+void spausdintiRezultatus(vector<Studentas> studentai, bool* vidurkis, bool* isFailo);
+void kurtiFailus();
 
 int main() {
-  bool vidurkis = true, isFailo = false;
+	bool vidurkis = true, isFailo = false;
 
-  vector<Studentas> studentai;
-  nuskaityti(&studentai, &vidurkis, &isFailo);
-  spausdintiRezultatus(studentai, &vidurkis, &isFailo);
+	vector<Studentas> studentai;
+	nuskaityti(&studentai, &vidurkis, &isFailo, "kursiokai.txt");
+	spausdintiRezultatus(studentai, &vidurkis, &isFailo);
 }
 
-void nuskaityti(vector<Studentas> *studentai, bool *vidurkis, bool *isFailo) {
-  string s_temp;
-  cout << "Ar nuskaityti duomenis is failo?" << endl;
-  cin >> s_temp;
+void nuskaityti(vector<Studentas>* studentai, bool* vidurkis, bool* isFailo, string fileName) {
+	string s_temp;
 
-  // jeip ats = taip, tai skaitom duomenis is failo
-  if(gautiAtsakyma(s_temp)) {
-    nuskaitytiIsFailo(studentai, isFailo);
-    return;
-  }
+	cout << "Pradeti spartos analize?" << endl;
+	cout << "Taip = testi, ne = eiti i rusiavima studentu is failu." << endl;
+	cin >> s_temp;
 
-  int i_temp, dydis;
+	// jeip ats = taip, kuriam naujus spartos analizes failus
+	if (gautiAtsakyma(s_temp)) {
+		kurtiFailus();
+		return;
+	}
 
-  // Gauna studentu skaiciu
-  int studentuSk;
-  cout << "Iveskite studentu skaiciu:" << endl;
-  cin >> studentuSk;
+	cout << "Ar nuskaityti duomenis is failo?" << endl;
+	cin >> s_temp;
 
-  // Vidurkio skaiciavimas
-  cout << "Vesti studentu vidurki? [taip = vidurkis, ne = mediana]:" << endl;
-  cin >> s_temp;
+	// jeip ats = taip, tai skaitom duomenis is failo
+	if (gautiAtsakyma(s_temp)) {
+		nuskaitytiIsFailo(studentai, isFailo, fileName);
+		return;
+	}
 
-  *vidurkis = gautiAtsakyma(s_temp);
+	int i_temp, dydis;
 
-  // Studentu informacijos kolekcija
-  for(int i = 1; i < studentuSk+1; i++) {
-    Studentas stud;
+	// Gauna studentu skaiciu
+	int studentuSk;
+	cout << "Iveskite studentu skaiciu:" << endl;
+	cin >> studentuSk;
 
-    cout << "#" << i << " Studento Vardas:" << endl;
-    cin >> stud.vardas;
+	// Vidurkio skaiciavimas
+	cout << "Vesti studentu vidurki? [taip = vidurkis, ne = mediana]:" << endl;
+	cin >> s_temp;
 
-    cout << "#" << i << " Studento Pavarde:" << endl;
-    cin >> stud.pavarde;
-    int p = 1;
-    while(true) {    
-        cout << "Iveskite " << p << " pazymi [1 - 10], 0 = atsitiktinis, -1 = pabaigti:" << endl;
-        cin >> s_temp;
-        i_temp = arPazymys(s_temp);
+	*vidurkis = gautiAtsakyma(s_temp);
 
-        if(i_temp == -1) {
-          break;
-        }
+	// Studentu informacijos kolekcija
+	for (int i = 1; i < studentuSk + 1; i++) {
+		Studentas stud;
 
-        stud.pazymiai.push_back(i_temp);
-        p++;
-    }
+		cout << "#" << i << " Studento Vardas:" << endl;
+		cin >> stud.vardas;
 
-    bool egzAtsitiktinis;
-    cout << "Ar egzamino rezultatas atsitiktinis [taip/ne]:" << endl;
+		cout << "#" << i << " Studento Pavarde:" << endl;
+		cin >> stud.pavarde;
+		int p = 1;
+		while (true) {
+			cout << "Iveskite " << p << " pazymi [1 - 10], 0 = atsitiktinis, -1 = pabaigti:" << endl;
+			cin >> s_temp;
+			i_temp = arPazymys(s_temp);
 
-    cin >> s_temp;
-    
-    // Egzamino rezultato gavimas
-    egzAtsitiktinis = gautiAtsakyma(s_temp);
-    if(egzAtsitiktinis) {
-        stud.egzaminas = gautiAtsitiktini();
-    } else {
-      cout << "Egzamino rezultatas [1 - 10]:" << endl;
-      cin >> s_temp;
+			if (i_temp == -1) {
+				break;
+			}
 
-      i_temp = arPazymys(s_temp);
+			stud.pazymiai.push_back(i_temp);
+			p++;
+		}
 
-      // netinkamas balas
-      if(i_temp == -2) {
-        continue;
-      }
+		bool egzAtsitiktinis;
+		cout << "Ar egzamino rezultatas atsitiktinis [taip/ne]:" << endl;
 
-      stud.egzaminas = i_temp * 0.6;
-    }
-    
-    dydis = stud.pazymiai.size();
+		cin >> s_temp;
 
-    if(vidurkis) {
-      stud.vidurkis = skaiciuotiVidurki(stud);
-    } else {
-      // maz - didz sort'as
-      sort(stud.pazymiai.begin(), stud.pazymiai.end());
+		// Egzamino rezultato gavimas
+		egzAtsitiktinis = gautiAtsakyma(s_temp);
+		if (egzAtsitiktinis) {
+			stud.egzaminas = gautiAtsitiktini();
+		}
+		else {
+			cout << "Egzamino rezultatas [1 - 10]:" << endl;
+			cin >> s_temp;
 
-      // medianos skaiciavimas, tikrinama ar lyginis skaicius pazymiu ar ne
-      stud.mediana = skaiciuotiMediana(stud);
-    }
+			i_temp = arPazymys(s_temp);
 
-    studentai -> push_back(stud);
-    cout << "------------------------------------------------------------" << endl;
-  }
+			// netinkamas balas
+			if (i_temp == -2) {
+				continue;
+			}
+
+			stud.egzaminas = i_temp * 0.6;
+		}
+
+		dydis = stud.pazymiai.size();
+
+		if (vidurkis) {
+			stud.vidurkis = skaiciuotiVidurki(stud);
+		}
+		else {
+			// maz - didz sort'as
+			sort(stud.pazymiai.begin(), stud.pazymiai.end());
+
+			// medianos skaiciavimas, tikrinama ar lyginis skaicius pazymiu ar ne
+			stud.mediana = skaiciuotiMediana(stud);
+		}
+
+		studentai->push_back(stud);
+		cout << "------------------------------------------------------------" << endl;
+	}
 }
 
-void nuskaitytiIsFailo(vector<Studentas> *studentai, bool* isFailo) {
-  int pazymiuSkaicius = 0, dabarSk = 1, paz;
-  ifstream kursiokai;
-  try {
-    kursiokai.open("kursiokai.txt");
-  } catch(std::exception &e) {
-    cout << "Nerastas kursiokai.txt failas" << endl;
-  }
-  
-  string duom;
-  Studentas stud;
+void nuskaitytiIsFailo(vector<Studentas>* studentai, bool* isFailo, string fileName) {
+	int pazymiuSkaicius = 0, dabarSk = 1, paz;
+	ifstream kursiokai;
+	try {
+		kursiokai.open(fileName);
+	}
+	catch (std::exception& e) {
+		cout << "Nerastas failas" << endl;
+		return;
+	}
 
-  bool loop = true; // false jei klaida duomenyse
+	string duom;
+	Studentas stud;
 
-  int rezultatas = 0;
-  // rezultatas = 0, tai dar vis skaitoma pirma eilute
-  // rezultatas = 1, skaitomas vardas
-  // rezultatas = 2, skaitoma pavarde
-  // rezultatas = 3, skaitomas paz.
-  // rezultats = 4, skaitomas egz
-  loop:while(kursiokai >> duom && loop) {
-    switch(rezultatas) {
-      case 0: {
-        if(startsWith(duom, "ND")) {
-          pazymiuSkaicius++;
-        } else if(startsWith(duom, "Egz")) {
-          rezultatas++;
-        }
-        break;
-      }
-      case 1: {
-        stud.vardas = duom;
-        rezultatas++;
-        break;
-      }
-      case 2: {
-        stud.pavarde = duom;
-        rezultatas++;
-        break;
-      }
-      case 3: {
-        if(dabarSk >= pazymiuSkaicius) {
-          rezultatas++;
-          dabarSk = 1;
-          break;
-        }
+	bool loop = true; // false jei klaida duomenyse
 
-        dabarSk++;
-        paz = parse(duom);
-        if(paz == -2 || arPazymys(duom) == -2) {
-          loop = false;
-          cout << "Ivestas neteisingas pazymys studento: " << stud.vardas << " " << stud.pavarde << endl;
-          cout << "Pazymio ivestis: " << duom << ", pazymio nr.: " << dabarSk << endl;
-          break;
-        }
+	int rezultatas = 0;
+	// rezultatas = 0, tai dar vis skaitoma pirma eilute
+	// rezultatas = 1, skaitomas vardas
+	// rezultatas = 2, skaitoma pavarde
+	// rezultatas = 3, skaitomas paz.
+	// rezultats = 4, skaitomas egz
+loop:while (kursiokai >> duom && loop) {
+	switch (rezultatas) {
+	case 0: {
+		if (startsWith(duom, "ND")) {
+			pazymiuSkaicius++;
+		}
+		else if (startsWith(duom, "Egz")) {
+			rezultatas++;
+		}
+		break;
+	}
+	case 1: {
+		stud.vardas = duom;
+		rezultatas++;
+		break;
+	}
+	case 2: {
+		stud.pavarde = duom;
+		rezultatas++;
+		break;
+	}
+	case 3: {
+		if (dabarSk >= pazymiuSkaicius) {
+			rezultatas++;
+			dabarSk = 1;
+			break;
+		}
 
-        stud.pazymiai.push_back(paz);
-        break;
-      }
-      case 4: {
-        stud.egzaminas = parse(duom);
-        
-        // Medianai sort'ina
-        sort(stud.pazymiai.begin(), stud.pazymiai.end());
-        stud.vidurkis = skaiciuotiVidurki(stud);
-        stud.mediana = skaiciuotiMediana(stud);
+		dabarSk++;
+		paz = parse(duom);
+		if (paz == -2 || arPazymys(duom) == -2) {
+			loop = false;
+			cout << "Ivestas neteisingas pazymys studento: " << stud.vardas << " " << stud.pavarde << endl;
+			cout << "Pazymio ivestis: " << duom << ", pazymio nr.: " << dabarSk << endl;
+			break;
+		}
 
-        studentai -> push_back(stud);
-        stud = {};
+		stud.pazymiai.push_back(paz);
+		break;
+	}
+	case 4: {
+		stud.egzaminas = parse(duom);
 
-        rezultatas = 1;
-        break;
-      }
-    }
-  }
+		// Medianai sort'ina
+		sort(stud.pazymiai.begin(), stud.pazymiai.end());
+		stud.vidurkis = skaiciuotiVidurki(stud);
+		stud.mediana = skaiciuotiMediana(stud);
+
+		studentai->push_back(stud);
+		stud = {};
+
+		rezultatas = 1;
+		break;
+	}
+	}
+}
 
 }
 
-void spausdintiRezultatus(vector<Studentas> studentai, bool *vidurkis, bool *isFailo) {
+void spausdintiRezultatus(vector<Studentas> studentai, bool* vidurkis, bool* isFailo) {
+	cout << std::fixed;
+	cout << std::setprecision(2);
 
-  cout << std::fixed;
-  cout << std::setprecision(2);
+	cout << left
+		<< setw(15) << "Vardas"
+		<< setw(15) << "Pavarde";
 
-  cout << left
-	<< setw(15) << "Vardas"
-	<< setw(15) << "Pavarde";
+	if (!isFailo) {
+		cout << setw(15) <<
+			(vidurkis ? "Galutinis (Vid.)" : "Galutinis (Med.)") << endl;
+	}
+	else {
+		cout << setw(16) << "Galutinis (Vid.)";
+		cout << setw(16) << "Galutinis (Med.)" << endl;
+	}
+	cout << "------------------------------------------------------------" << endl;
 
-  if(!isFailo) {
-    cout << setw(15) << 
-    (vidurkis ?  "Galutinis (Vid.)" : "Galutinis (Med.)" ) << endl;
-	} else {
-    cout << setw(16) << "Galutinis (Vid.)" ;
-    cout << setw(16) << "Galutinis (Med.)" << endl;
-  }
-  cout << "------------------------------------------------------------" << endl;
-
-  Studentas stud;
-  for(int i = 0; i < studentai.size(); i++) {
-    stud = studentai[i];
-    cout << left
+	Studentas stud;
+	for (int i = 0; i < studentai.size(); i++) {
+		stud = studentai[i];
+		cout << left
 			<< setw(15) << stud.vardas
 			<< setw(15) << stud.pavarde;
 
-      if(!isFailo) {
-        cout << setw(15) << (stud.egzaminas + (vidurkis ? stud.vidurkis : stud.mediana)) << endl;
-      } else {
-        cout << setw(16) << (stud.egzaminas + stud.vidurkis);
-        cout << setw(16) << stud.mediana << endl;
-      }
-  }
+		if (!isFailo) {
+			cout << setw(15) << (stud.egzaminas + (vidurkis ? stud.vidurkis : stud.mediana)) << endl;
+		}
+		else {
+			cout << setw(16) << (stud.egzaminas + stud.vidurkis);
+			cout << setw(16) << stud.mediana << endl;
+		}
+	}
+}
+void rasytiFaila(vector<Studentas> studentai, string fileName) {
+	Studentas stud;
+
+	fstream write;
+	write.open(fileName, fstream::out);
+
+	write << "Vardas" << setw(10) << "Pavarde" << setw(8);
+	for (int pazSk = 1; pazSk < 10 + 1; pazSk++) {
+		write << "ND " << pazSk << setw(8);
+	}
+	write << "Egz.";
+	write << endl;
+
+	for (int i = 1; i < studentai.size() + 1; i++) {
+		stud = studentai[i - 1];
+		write << stud.vardas << setw(15) << stud.pavarde << setw(15);
+		for (int paz = 0; paz < stud.pazymiai.size(); paz++) {
+			write << stud.pazymiai[paz] << setw(8);
+		}
+		write << stud.egzaminas;
+		write << endl;
+	}
+}
+
+void generuotiFaila(int size) {
+	auto pradzia = getTimeNow();
+
+	string fileName;
+	fileName += std::to_string(size);
+	fileName += ".txt";
+
+	vector<Studentas> studentai;
+	for (int i = 0; i < size; i++) {
+		studentai.push_back(generuotiStudenta(i, 10));
+	}
+
+	rasytiFaila(studentai, fileName);
+	auto pabaiga = getTimeNow();
+
+	cout << "Sukurtas failas " << fileName << ", uztruko: " << (pabaiga - pradzia) << "ms" << endl;
+}
+
+
+void kurtiFailus() {
+	vector<int> failuDydziai;
+	failuDydziai.push_back(10);
+	failuDydziai.push_back(100);
+	failuDydziai.push_back(1000);
+	failuDydziai.push_back(10000);
+	failuDydziai.push_back(100000);
+
+	string s_temp;
+	bool t = true;
+	Studentas stud;
+
+	cout << "Kurti spartos analizes failus? (UZTRUKS DAUG LAIKO!)" << endl;
+	cin >> s_temp;
+
+	// jeip ats = taip, kuriam naujus spartos analizes failus
+	if (gautiAtsakyma(s_temp)) {
+
+		for (int i = 0; i < failuDydziai.size(); i++) {
+			int dydis = failuDydziai[i];
+			cout << "Kuriam " << dydis << ".txt faila" << endl;
+			generuotiFaila(dydis);
+		}
+	}
+
+	cout << "Pradedama spartos analize" << endl;
+
+	for (int i = 0; i < failuDydziai.size(); i++) {
+		auto failoPradzia = getTimeNow();
+		vector<Studentas> studentai, vargsai, galvociai;
+
+		int dydis = failuDydziai[i];
+		string name;
+		name += std::to_string(dydis);
+		name += ".txt";
+
+		long pradzia = getTimeNow();
+		nuskaitytiIsFailo(&studentai, &t, name);
+		long pabaiga = getTimeNow();
+
+		cout << dydis << " failas nuskaitytas per " << (pabaiga - pradzia) << "ms" << endl;
+
+		pradzia = getTimeNow();
+		sort(studentai.begin(), studentai.end());
+		pabaiga = getTimeNow();
+
+		cout << dydis << " surusiavo naudojant sort per: " << (pabaiga - pradzia) << "ms" << endl;
+
+		pradzia = getTimeNow();
+		for (int s = 0; s < studentai.size(); s++) {
+			stud = studentai[s];
+			if (stud.vidurkis < 5) {
+				vargsai.push_back(stud);
+			}
+			else {
+				galvociai.push_back(stud);
+			}
+		}
+		pabaiga = getTimeNow();
+
+		cout << dydis << " dalijimo i 2 grupes (<5, >=5) laikas: " << (pabaiga - pradzia) << "ms" << endl;
+
+		pradzia = getTimeNow();
+		rasytiFaila(vargsai, "vargsuFile.txt");
+		pabaiga = getTimeNow();
+
+		cout << dydis << " vargsu failas uztruko: " << (pabaiga - pradzia) << "ms" << endl;
+
+		pradzia = getTimeNow();
+		rasytiFaila(galvociai, "galvociuFile.txt");
+		pabaiga = getTimeNow();
+
+		cout << dydis << " galvociu failas uztruko: " << (pabaiga - pradzia) << "ms" << endl;
+
+		auto failoPabaiga = getTimeNow();
+		cout << dydis << " failo testas uztruko "
+			<< (failoPabaiga - failoPradzia) << "ms, sekundes: " << ((failoPabaiga - failoPradzia) / 1000.00) << endl;
+	}
 }
