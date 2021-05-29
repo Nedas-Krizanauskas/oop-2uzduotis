@@ -1,4 +1,5 @@
 #include <iostream>
+#include <list>
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -9,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include "Studentas.cpp" // studentas
 
 using std::string;
 using std::vector;
@@ -20,16 +22,7 @@ using std::setw;
 using std::left;
 using std::ifstream;
 using std::fstream;
-struct Studentas {
-	string vardas, pavarde;
-	float mediana, vidurkis, egzaminas;
-	vector<int> pazymiai;
 
-	bool operator<(const Studentas& a) const
-	{
-		return vidurkis < a.vidurkis;
-	}
-};
 
 // dabartinis laikas naudojant milliseconds
 auto getTimeNow() {
@@ -45,10 +38,6 @@ int gautiAtsitiktini() {
 	return rand() % 10 + 1;
 }
 
-float apvalinti(float input) {
-	return ((int)(input * 100.0 + 0.5)) / 100.0;
-}
-
 int parse(string s) {
 	try {
 		return stoi(s);
@@ -56,15 +45,6 @@ int parse(string s) {
 	catch (std::invalid_argument const& e) {
 		return -2;
 	}
-}
-
-float skaiciuotiMediana(Studentas stud) {
-	int dydis = stud.pazymiai.size();
-	return dydis % 2 == 0 ? (stud.pazymiai[dydis / 2.0 - 1.0] + stud.pazymiai[dydis / 2.0]) / 2.0 : stud.pazymiai[dydis / 2.0];
-}
-
-float skaiciuotiVidurki(Studentas stud) {
-	return apvalinti((accumulate(stud.pazymiai.begin(), stud.pazymiai.end(), 0.0) / stud.pazymiai.size()) * 0.4);
 }
 
 int arPazymys(string s) {
@@ -102,21 +82,26 @@ bool gautiAtsakyma(string ats) {
 	return false;
 }
 
+
+
 Studentas generuotiStudenta(int poz, int pazymiuSk) {
 	Studentas stud;
-	stud.vardas = "Vardas";
-	stud.pavarde = "Pavarde";
+	string vardas = "Vardas";
+	string pavarde = "Pavarde";
 
 	int tempPaz;
 
-	stud.vardas += std::to_string(poz);
-	stud.pavarde += std::to_string(poz);
+	vardas += std::to_string(poz);
+	pavarde += std::to_string(poz);
 
+	stud.pakeistiVarda(vardas);
+	//stud.vardas = "Vardas";
+	stud.pakeistiPavarde(pavarde);
 	double visasVidurkis = 0.0;
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < pazymiuSk; i++) {
 		tempPaz = gautiAtsitiktini();
-		stud.pazymiai.push_back(tempPaz);
+		stud.pridetiPazymi(tempPaz);
 
 		visasVidurkis += tempPaz;
 	}
@@ -124,8 +109,8 @@ Studentas generuotiStudenta(int poz, int pazymiuSk) {
 	visasVidurkis /= (pazymiuSk * 1.0);
 	visasVidurkis *= 0.4;
 
-	stud.egzaminas = gautiAtsitiktini();
-	stud.vidurkis = visasVidurkis + (stud.egzaminas * 0.6);
+	stud.pakeistiEgzamina(gautiAtsitiktini());
+	stud.pakeistiVidurki(visasVidurkis + (stud.egzaminas() * 0.6));
 
 	return stud;
 }
