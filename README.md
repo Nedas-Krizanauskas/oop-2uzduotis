@@ -41,7 +41,7 @@ Atlikta Naudojant Intel-i7 7700k 3.60ghz, 16GB RAM 2666Mhz, SSD
 |Duomenų išrikiavimas |0s|0,002s|0,014s|0,122s|1,091s|
 
 
-# 2 Budas, Matvimai
+## 2 Budas, Matavimai
 ### Vector:
 |Funkcija|n = 10|n = 100|n = 1000|n = 10,000|n = 100,000|
 |----|---|---|----|------|------|
