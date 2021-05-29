@@ -1,5 +1,5 @@
 #include <iostream>
-#include "funkcijos.h" // programos funkcijos, studentu info
+#include "funkcijos.h" // programos funkcijos
 
 void nuskaityti(vector<Studentas>* studentai, bool* vidurkis, bool* isFailo, string fileName);
 void nuskaitytiIsFailo(vector<Studentas>* studentai, bool* isFailo, string fileName);
@@ -9,7 +9,7 @@ void kurtiFailus();
 int main() {
 	bool vidurkis = true, isFailo = false;
 
-	vector<Studentas> studentai;
+	vector<Studentas> studentai, vargsiukai;
 	nuskaityti(&studentai, &vidurkis, &isFailo, "kursiokai.txt");
 	spausdintiRezultatus(studentai, &vidurkis, &isFailo);
 }
@@ -17,26 +17,38 @@ int main() {
 void nuskaityti(vector<Studentas>* studentai, bool* vidurkis, bool* isFailo, string fileName) {
 	string s_temp;
 
-	cout << "Pradeti spartos analize?" << endl;
-	cout << "Taip = testi, ne = eiti i rusiavima studentu is failu." << endl;
+	cout << "Studentu pazymiu rusiavimo programa (Sukure: Nedas Krizanauskas)." << endl;
+	cout << "" << endl;
+	cout << "Pasirinkite tolesni zingsni:" << endl;
+	cout << "- 1: Pradeti spartos analize" << endl;
+	cout << "- 2: Nuskaityti studentu duomenis is failo (kursiokai.txt)" << endl;
+	cout << "- 3: Ivesti studentu duomenis ranka" << endl;
+	cout << "" << endl;
+	cout << "Iveskite uzduoties skaiciu, kad pradeti:" << endl;
+
 	cin >> s_temp;
 
-	// jeip ats = taip, kuriam naujus spartos analizes failus
-	if (gautiAtsakyma(s_temp)) {
+
+	int i_temp, dydis;
+	i_temp= parse(s_temp);
+
+	switch (i_temp) {
+	case 1: {
 		kurtiFailus();
 		return;
 	}
-
-	cout << "Ar nuskaityti duomenis is failo?" << endl;
-	cin >> s_temp;
-
-	// jeip ats = taip, tai skaitom duomenis is failo
-	if (gautiAtsakyma(s_temp)) {
+	case 2: {
 		nuskaitytiIsFailo(studentai, isFailo, fileName);
 		return;
 	}
-
-	int i_temp, dydis;
+	case 3: {
+		break;
+	}
+	 default: {
+		 cout << "Nerasta uzduotis, programa stabdoma." << endl;
+		return;
+	}
+	}
 
 	// Gauna studentu skaiciu
 	int studentuSk;
@@ -54,10 +66,10 @@ void nuskaityti(vector<Studentas>* studentai, bool* vidurkis, bool* isFailo, str
 		Studentas stud;
 
 		cout << "#" << i << " Studento Vardas:" << endl;
-		cin >> stud.vardas;
+		cin >> stud.vardas();
 
 		cout << "#" << i << " Studento Pavarde:" << endl;
-		cin >> stud.pavarde;
+		cin >> stud.pavarde();
 		int p = 1;
 		while (true) {
 			cout << "Iveskite " << p << " pazymi [1 - 10], 0 = atsitiktinis, -1 = pabaigti:" << endl;
@@ -68,7 +80,7 @@ void nuskaityti(vector<Studentas>* studentai, bool* vidurkis, bool* isFailo, str
 				break;
 			}
 
-			stud.pazymiai.push_back(i_temp);
+			stud.pazymiai().push_back(i_temp);
 			p++;
 		}
 
@@ -80,7 +92,7 @@ void nuskaityti(vector<Studentas>* studentai, bool* vidurkis, bool* isFailo, str
 		// Egzamino rezultato gavimas
 		egzAtsitiktinis = gautiAtsakyma(s_temp);
 		if (egzAtsitiktinis) {
-			stud.egzaminas = gautiAtsitiktini();
+			stud.pakeistiEgzamina(gautiAtsitiktini());
 		}
 		else {
 			cout << "Egzamino rezultatas [1 - 10]:" << endl;
@@ -93,20 +105,21 @@ void nuskaityti(vector<Studentas>* studentai, bool* vidurkis, bool* isFailo, str
 				continue;
 			}
 
-			stud.egzaminas = i_temp * 0.6;
+			stud.pakeistiEgzamina(i_temp * 0.6);
 		}
 
-		dydis = stud.pazymiai.size();
+		dydis = stud.pazymiai().size();
 
 		if (vidurkis) {
-			stud.vidurkis = skaiciuotiVidurki(stud);
+			stud.skaiciuotiVidurki();
 		}
 		else {
 			// maz - didz sort'as
-			sort(stud.pazymiai.begin(), stud.pazymiai.end());
+			//sort(stud.pazymiai.begin(), stud.pazymiai.end());
 
 			// medianos skaiciavimas, tikrinama ar lyginis skaicius pazymiu ar ne
-			stud.mediana = skaiciuotiMediana(stud);
+			stud.pakeistiEgzamina(stud.skaiciuotiMediana());
+			//stud.skaiciuotiMediana(); //TODO: fix
 		}
 
 		studentai->push_back(stud);
@@ -148,12 +161,12 @@ loop:while (kursiokai >> duom && loop) {
 		break;
 	}
 	case 1: {
-		stud.vardas = duom;
+		stud.pakeistiVarda(duom);
 		rezultatas++;
 		break;
 	}
 	case 2: {
-		stud.pavarde = duom;
+		stud.pakeistiPavarde(duom);
 		rezultatas++;
 		break;
 	}
@@ -168,24 +181,24 @@ loop:while (kursiokai >> duom && loop) {
 		paz = parse(duom);
 		if (paz == -2 || arPazymys(duom) == -2) {
 			loop = false;
-			cout << "Ivestas neteisingas pazymys studento: " << stud.vardas << " " << stud.pavarde << endl;
+			cout << "Ivestas neteisingas pazymys studento: " << stud.vardas() << " " << stud.pavarde() << endl;
 			cout << "Pazymio ivestis: " << duom << ", pazymio nr.: " << dabarSk << endl;
 			break;
 		}
 
-		stud.pazymiai.push_back(paz);
+		stud.pazymiai().push_back(paz);
 		break;
 	}
 	case 4: {
-		stud.egzaminas = parse(duom);
+		stud.pakeistiEgzamina(parse(duom));
 
 		// Medianai sort'ina
-		sort(stud.pazymiai.begin(), stud.pazymiai.end());
-		stud.vidurkis = skaiciuotiVidurki(stud);
-		stud.mediana = skaiciuotiMediana(stud);
+		//sort(stud.pazymiai.begin(), stud.pazymiai.end());
+		stud.skaiciuotiVidurki();
+		stud.skaiciuotiMediana();
 
 		studentai->push_back(stud);
-		stud = {};
+		//stud = {};
 
 		rezultatas = 1;
 		break;
@@ -217,15 +230,15 @@ void spausdintiRezultatus(vector<Studentas> studentai, bool* vidurkis, bool* isF
 	for (int i = 0; i < studentai.size(); i++) {
 		stud = studentai[i];
 		cout << left
-			<< setw(15) << stud.vardas
-			<< setw(15) << stud.pavarde;
+			<< setw(15) << stud.vardas()
+			<< setw(15) << stud.pavarde();
 
 		if (!isFailo) {
-			cout << setw(15) << (stud.egzaminas + (vidurkis ? stud.vidurkis : stud.mediana)) << endl;
+			cout << setw(15) << (stud.egzaminas() + (vidurkis ? stud.vidurkis() : stud.mediana())) << endl;
 		}
 		else {
-			cout << setw(16) << (stud.egzaminas + stud.vidurkis);
-			cout << setw(16) << stud.mediana << endl;
+			cout << setw(16) << (stud.egzaminas() + stud.vidurkis());
+			cout << setw(16) << stud.mediana() << endl;
 		}
 	}
 }
@@ -239,16 +252,21 @@ void rasytiFaila(vector<Studentas> studentai, string fileName) {
 	for (int pazSk = 1; pazSk < 10 + 1; pazSk++) {
 		write << "ND " << pazSk << setw(8);
 	}
+
 	write << "Egz.";
 	write << endl;
 
 	for (int i = 1; i < studentai.size() + 1; i++) {
 		stud = studentai[i - 1];
-		write << stud.vardas << setw(15) << stud.pavarde << setw(15);
-		for (int paz = 0; paz < stud.pazymiai.size(); paz++) {
-			write << stud.pazymiai[paz] << setw(8);
+		write << stud.vardas() << setw(15) << stud.pavarde() << setw(15);
+
+		int pazymiuSk = stud.pazymiai().size();
+
+		for (int paz = 0; paz < stud.pazymiai().size(); paz++) {
+			write << stud.pazymiai()[paz] << setw(8);
 		}
-		write << stud.egzaminas;
+
+		write << stud.egzaminas();
 		write << endl;
 	}
 }
@@ -278,7 +296,7 @@ void kurtiFailus() {
 	failuDydziai.push_back(100);
 	failuDydziai.push_back(1000);
 	failuDydziai.push_back(10000);
-	failuDydziai.push_back(100000);
+	//failuDydziai.push_back(100000);
 
 	string s_temp;
 	bool t = true;
@@ -315,15 +333,9 @@ void kurtiFailus() {
 		cout << dydis << " failas nuskaitytas per " << (pabaiga - pradzia) << "ms" << endl;
 
 		pradzia = getTimeNow();
-		sort(studentai.begin(), studentai.end());
-		pabaiga = getTimeNow();
-
-		cout << dydis << " surusiavo naudojant sort per: " << (pabaiga - pradzia) << "ms" << endl;
-
-		pradzia = getTimeNow();
 		for (int s = 0; s < studentai.size(); s++) {
 			stud = studentai[s];
-			if (stud.vidurkis < 5) {
+			if (stud.vidurkis() < 5) {
 				vargsai.push_back(stud);
 			}
 			else {
