@@ -60,16 +60,18 @@ void nuskaityti(vector<Studentas>* studentai, bool* vidurkis, bool* isFailo, str
 	cin >> s_temp;
 
 	*vidurkis = gautiAtsakyma(s_temp);
+	string vardas, pavarde;
 
 	// Studentu informacijos kolekcija
 	for (int i = 1; i < studentuSk + 1; i++) {
 		Studentas stud;
 
 		cout << "#" << i << " Studento Vardas:" << endl;
-		cin >> stud.vardas();
+		cin >> vardas;
+		stud.pakeistiVarda(vardas);
 
 		cout << "#" << i << " Studento Pavarde:" << endl;
-		cin >> stud.pavarde();
+		cin >> pavarde;
 		int p = 1;
 		while (true) {
 			cout << "Iveskite " << p << " pazymi [1 - 10], 0 = atsitiktinis, -1 = pabaigti:" << endl;
